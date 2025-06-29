@@ -1,0 +1,260 @@
+{% set startDate = request.args.get('startDate', '') %}
+{% set endDate = request.args.get('endDate', '') %}
+
+{% set date_params = '' %}
+{% if startDate %}
+  {% set date_params = date_params + '&startDate=' + startDate %}
+{% endif %}
+{% if endDate %}
+  {% set date_params = date_params + '&endDate=' + endDate %}
+{% endif %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>实时系统的话题分析系统</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon">
+  <link href="../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet">
+
+  <style>
+  /* 绿色系日期时间输入框样式 */
+  input[type="datetime-local"] {
+    border: 2px solid #c5eace;       /* 绿色边框 */
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-weight: 600;
+    color: #155724;                  /* 深绿色字体 */
+    background-color: #eaf5ee;      /* 浅绿色背景 */
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  input[type="datetime-local"]:focus {
+    border-color: #218838;           /* 聚焦更深绿 */
+    box-shadow: 0 0 5px 1px #28a745aa; /* 绿色阴影 */
+    outline: none;
+    background-color: #c3e6cb;
+  }
+
+  /* 对placeholder也染绿 */
+  input[type="datetime-local"]::placeholder {
+    color: #28a745;
+    opacity: 0.7;
+  }
+</style>
+
+</head>
+
+<body>
+  <!-- ======= Header ======= -->
+  <header id="header">
+    <div class="container">
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav><!-- .nav-menu -->
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Our Team Section ======= -->
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title">
+        <h2>实时系统的话题分析系统</h2>
+      </div>
+
+      <!-- 添加时间段选择器 -->
+      <div class="row mb-4">
+        <div class="col-md-12 text-center">
+          <label for="startDate" class="mr-2">选择开始时间：</label>
+          <input type="datetime-local" id="startDate" class="form-control d-inline-block" onchange="filterByDateRange()" style="width: 200px;"
+            value="{{ startDate }}">
+          <label for="endDate" class="mr-2 ml-3">选择结束时间：</label>
+          <input type="datetime-local" id="endDate" class="form-control d-inline-block" onchange="filterByDateRange()" style="width: 200px;"
+            value="{{ endDate }}">
+        </div>
+      </div>
+
+      <script>
+        function filterByDateRange() {
+          const startDate = document.getElementById('startDate').value;
+          const endDate = document.getElementById('endDate').value;
+
+          // 将选择的时间参数附加到URL中跳转
+          let url = "?";
+          if (startDate) url += "startDate=" + encodeURIComponent(startDate) + "&";
+          if (endDate) url += "endDate=" + encodeURIComponent(endDate) + "&";
+
+          // 跳转到第一页，清除之前分页参数
+          window.location.href = url + "page=1";
+        }
+      </script>
+
+      <!-- ======= Counts Section ======= -->
+      <section class="counts section-bg">
+        <div class="container">
+          <table class="table table-striped table-hover ">
+            <tr>
+              <td>id</td>
+              <td>标题</td>
+              <td>内容</td>
+              <td>发布时间</td>
+              <td>来源</td>
+              <td>keywords</td>
+            </tr>
+            {% for new in news %}
+            <tr>
+              <td>{{ new[0] }}</td>
+              <td>
+                <a href="{{ new[1] }}" target="_blank">{{ new[2] }}</a>
+              </td>
+              <td>
+                <span id="preview-{{ loop.index }}">{{ new[3][:100] }}{% if new[3]|length > 100 %}...{% endif %}</span>
+                {% if new[3]|length > 100 %}
+                <a href="javascript:void(0);" onclick="toggleContent('{{ loop.index }}')" id="btn-{{ loop.index }}">显示全文</a>
+                <span id="full-{{ loop.index }}" style="display:none;">{{ new[3] }}</span>
+                {% endif %}
+              </td>
+              <td>{{ new[4] }}</td>
+              <td>{{ new[5] }}</td>
+              <td>{{ new[8] }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+
+        <script>
+          function toggleContent(index) {
+            const preview = document.getElementById('preview-' + index);
+            const full = document.getElementById('full-' + index);
+            const btn = document.getElementById('btn-' + index);
+            if (full.style.display === "none") {
+              preview.style.display = "none";
+              full.style.display = "inline";
+              btn.innerText = "收起";
+            } else {
+              preview.style.display = "inline";
+              full.style.display = "none";
+              btn.innerText = "显示全文";
+            }
+          }
+        </script>
+      </section>
+
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <!-- 上一页 -->
+          <li class="page-item {% if page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ page - 1 }}{{ date_params }}">上一页</a>
+          </li>
+
+          <!-- 首页按钮 -->
+          <li class="page-item {% if page == 1 %}active{% endif %}">
+            <a class="page-link" href="?page=1{{ date_params }}">1</a>
+          </li>
+
+          <!-- 左侧省略号 -->
+          {% if page > 4 %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+
+          <!-- 当前页附近的页码 -->
+          {% for p in range(page-2, page+3) %}
+          {% if p > 1 and p < pages %}
+          <li class="page-item {% if p == page %}active{% endif %}">
+            <a class="page-link" href="?page={{ p }}{{ date_params }}">{{ p }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+
+          <!-- 右侧省略号 -->
+          {% if page < pages - 3 %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+
+          <!-- 末页按钮（只有多页时显示） -->
+          {% if pages > 1 %}
+          <li class="page-item {% if page == pages %}active{% endif %}">
+            <a class="page-link" href="?page={{ pages }}{{ date_params }}">{{ pages }}</a>
+          </li>
+          {% endif %}
+
+          <!-- 下一页 -->
+          <li class="page-item {% if page == pages %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ page + 1 }}{{ date_params }}">下一页</a>
+          </li>
+        </ul>
+
+        <!-- 跳转输入框 -->
+        <form class="form-inline justify-content-center mt-2" onsubmit="return goToPage(event)" data-max-page="{{ pages }}" data-date-params="{{ date_params }}">
+          <label for="pageInput" class="mr-2">跳转到第</label>
+          <input type="number" min="1" max="{{ pages }}" id="pageInput" class="form-control form-control-sm" style="width: 80px;" required>
+          <label class="ml-2 mr-2">页</label>
+          <button type="submit" class="btn btn-sm btn-primary">跳转</button>
+        </form>
+      </nav>
+
+      <script>
+        function goToPage(event) {
+          event.preventDefault();
+          const form = event.target;
+          const maxPage = parseInt(form.getAttribute('data-max-page'), 10) || 1;
+          const dateParams = form.getAttribute('data-date-params') || '';
+          const page = parseInt(document.getElementById('pageInput').value, 10);
+          if (isNaN(page) || page < 1 || page > maxPage) {
+            alert('请输入1到' + maxPage + '之间的页码');
+            return false;
+          }
+          window.location.href = '?page=' + page + dateParams;
+          return false;
+        }
+      </script>
+
+    </div>
+  </section>
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <!-- <script src="../static/assets/vendor/php-email-form/validate.js"></script> -->
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../static/assets/js/main.js"></script>
+
+</body>
+
+</html>

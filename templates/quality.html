@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <script src="../static/assets/js/echarts.min.js"></script>
+
+  <title>新闻数据分析 - 媒体来源热度对比</title>
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon" />
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900"
+    rel="stylesheet"
+  />
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet" />
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- ======= Header ======= -->
+  <header id="header">
+    <div class="container">
+        
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav>
+      <!-- .nav-menu -->
+    </div>
+  </header>
+  <!-- End Header -->
+
+  <!-- ======= Scatter Chart Section ======= -->
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title">
+        <h2>媒体来源与热度对比</h2>
+      </div>
+<section class="counts section-bg">
+      <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+      <div id="main" style="width: 100%; height: 400px;"></div>
+       <p style="color: gray; font-size: 12px; margin-top: 5px; text-align: center;">
+    注：此图去掉了观察者网
+  </p>
+    </div>
+  </section>
+  <!-- End Scatter Chart Section -->
+
+  <script type="text/javascript">
+    var dom = document.getElementById("main");
+    var myChart = echarts.init(dom);
+
+    // 后端传入的 data 变量，结构示例：
+    // [{ "来源": "新华网", "出现次数": 1234, "平均评论数": 56.78, "平均浏览量": 7890.12 }, ...]
+    var rawData = {{ data | tojson }};
+
+    // 防止平均浏览量或评论数为0，log轴无效，统一加偏移量1
+    var offset = 1;
+
+    // 转换为散点图数据格式： [ [平均浏览量+offset, 平均评论数+offset, 来源名称] ]
+    var scatterData = rawData.map(function (item) {
+      return [
+        item["平均浏览量"] + offset,
+        item["平均评论数"] + offset,
+        item["来源"]
+      ];
+    });
+
+    // 计算加偏移后的平均浏览量和平均评论数
+    var avg浏览量 = rawData.reduce(function (sum, item) {
+      return sum + (item["平均浏览量"] + offset);
+    }, 0) / rawData.length;
+
+    var avg评论数 = rawData.reduce(function (sum, item) {
+      return sum + (item["平均评论数"] + offset);
+    }, 0) / rawData.length;
+
+    var option = {
+      title: {
+        text: "媒体来源与热度对比（对数坐标轴）",
+        left: "center",
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: function (params) {
+          return (
+            "来源: " +
+            params.value[2] +
+            "<br/>平均浏览量: " +
+            (params.value[0] - offset).toFixed(2) +
+            "<br/>平均评论数: " +
+            (params.value[1] - offset).toFixed(2)
+          );
+        },
+      },
+      xAxis: {
+        name: "平均浏览量的对数刻度",
+        type: "log",
+        axisLabel: {
+          formatter: function (value) {
+            return (value - offset).toFixed(0);
+          }
+        },
+        splitLine: {
+          show: true
+        }
+      },
+      yAxis: {
+        name: "平均评论数的对数刻度",
+        type: "log",
+        axisLabel: {
+          formatter: function (value) {
+            return (value - offset).toFixed(0);
+          }
+        },
+        splitLine: {
+          show: true
+        }
+      },
+      series: [
+        {
+          name: "媒体来源",
+          type: "scatter",
+          symbolSize: 12,
+          data: scatterData,
+          itemStyle: {
+            color: "#28a745",
+          },
+          markLine: {
+            silent: true,
+            lineStyle: {
+              type: "dashed",
+              color: "#FF4500",
+            },
+            label: {
+              show: true,
+              formatter: function (param) {
+                if (param.data.xAxis !== undefined) return "平均浏览量";
+                if (param.data.yAxis !== undefined) return "平均评论数";
+                return "";
+              },
+              position: "end",
+              color: "#FF4500",
+              fontWeight: "bold",
+            },
+            data: [
+              { xAxis: avg浏览量 },
+              { yAxis: avg评论数 },
+            ],
+          },
+          emphasis: {
+            label: {
+              show: true,
+              formatter: function (param) {
+                return param.data[2]; // 显示来源名称
+              },
+              position: "top",
+            },
+          },
+        },
+      ],
+      grid: {
+        left: "10%",
+        right: "10%",
+        bottom: "15%",
+        containLabel: true,
+      },
+    };
+
+    myChart.setOption(option);
+  </script>
+</section>
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <!-- <script src="../static/assets/vendor/php-email-form/validate.js"></script> -->
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../static/assets/js/main.js"></script>
+</body>
+
+</html>

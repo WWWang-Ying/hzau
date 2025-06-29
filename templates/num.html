@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>新闻数据分析</title>
+
+  <link href="../static/assets/img/favicon.png" rel="icon" />
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet" />
+  <link href="../static/assets/css/style.css" rel="stylesheet" />
+
+  <style>
+    /* 侧边固定导航容器 */
+    .az-nav-collapsible {
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      width: 40px;  /* 默认只显示图标宽度 */
+      height: 40px;
+      background-color: #28a745;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(40, 167, 69, 0.7);
+      cursor: pointer;
+      transition: width 0.3s ease, height 0.3s ease;
+      overflow: hidden;
+      z-index: 1000;
+      user-select: none;
+    }
+
+    /* 鼠标悬停展开宽高 */
+    .az-nav-collapsible:hover {
+      width: 160px; /* 展开宽度 */
+      height: auto; /* 自动适应内容高度 */
+      padding: 10px;
+      background-color: #e9f7ec;
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.9);
+    }
+
+    /* 图标样式，居中显示 */
+    .az-nav-icon {
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+      font-weight: 700;
+      font-size: 20px;
+      color: white;
+      text-align: center;
+      user-select: none;
+    }
+
+    /* 展开时隐藏图标 */
+    .az-nav-collapsible:hover .az-nav-icon {
+      display: none;
+    }
+
+    /* 字母列表，默认隐藏 */
+    .az-nav-list {
+      display: none;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      user-select: none;
+    }
+
+    /* 展开时显示字母列表 */
+    .az-nav-collapsible:hover .az-nav-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* 每行4个字母 */
+      gap: 8px 10px;
+      user-select: auto;
+    }
+
+    /* 字母链接样式 */
+    .az-nav-list a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #28a745;
+      font-weight: 700;
+      font-size: 16px;
+      background-color: #d4edda;
+      border-radius: 8px;
+      padding: 6px 0;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+    }
+
+    .az-nav-list a:hover {
+      background-color: #28a745;
+      color: white;
+      box-shadow: 0 0 8px rgba(40, 167, 69, 0.9);
+    }
+
+    /* 主容器布局优化 */
+    body {
+      display: flex;
+      margin: 0;
+    }
+    
+    .content-wrapper {
+      flex: 1;
+      padding: 0 20px;
+      margin-left: 60px; /* 为侧边导航留出空间 */
+      transition: margin-left 0.3s ease;
+    }
+    
+    .az-nav-collapsible:hover ~ .content-wrapper {
+      margin-left: 180px; /* 导航展开时调整间距 */
+    }
+
+    /* 保留你已有的样式 */
+    .keyword-cloud {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      border: none;
+      border-radius: 12px;
+      background-color: none;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow: auto;
+    }
+
+    .keyword-group {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-auto-rows: 40px;
+      gap: 12px 15px;
+      margin-bottom: 30px;
+    }
+
+    .keyword-item {
+      border: 1.5px solid #28a745;
+      border-radius: 8px;
+      background-color: #d4edda;
+      color: #155724;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 8px;
+      text-align: center;
+      user-select: none;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .keyword-item:hover {
+      transform: scale(1.1);
+      font-weight: 700;
+      color: #19692c;
+      box-shadow: 0 0 10px rgba(40, 167, 69, 0.7);
+      background-color: #c3e6cb;
+    }
+
+    .letter-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #28a745;
+      margin-top: 40px;
+      margin-bottom: 15px;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .az-nav-collapsible {
+        display: none; /* 小屏幕隐藏侧边导航 */
+      }
+      
+      .content-wrapper {
+        margin-left: 0 !important;
+        padding: 0 15px;
+      }
+      
+      .keyword-group {
+        grid-template-columns: repeat(5, 1fr); /* 小屏幕减少列数 */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 侧边悬浮收起/展开A-Z导航 -->
+  <nav class="az-nav-collapsible" title="鼠标悬停展开字母导航" aria-label="字母导航">
+    <div class="az-nav-icon">A-Z</div>
+    <ul class="az-nav-list">
+      {% for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+        <li><a href="#letter-{{ c }}">{{ c }}</a></li>
+      {% endfor %}
+    </ul>
+  </nav>
+
+  <!-- 新增内容包裹层 -->
+  <div class="content-wrapper">
+    <header id="header">
+      <div class="container">
+        <nav class="nav-menu float-right d-none d-lg-block">
+          <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="counts section-bg">
+      <div class="container">
+        <div class="section-title">
+          <h2>关键词展示</h2>
+        </div>
+
+        <div class="keyword-cloud">
+          {% for initial, words in word_data.items() %}
+          <h3 class="letter-title" id="letter-{{ initial }}">{{ initial }}</h3>
+          <div class="keyword-group">
+            {% for item in words %}
+              <a
+                class="keyword-item"
+                href="word_doc.html?id={{ item.id }}"
+                title="出现频率：{{ item.weight }}"
+                target="_blank"
+              >
+              {{ item.word }}
+              </a>
+            {% endfor %}
+          </div>
+         {% endfor %}
+      </div>
+
+      </div>
+    </section>
+  </div>
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <!-- <script src="../static/assets/vendor/php-email-form/validate.js"></script> -->
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../static/assets/js/main.js"></script>
+</body>
+</html>
+    

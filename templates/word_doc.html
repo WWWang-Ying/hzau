@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>实时系统的话题分析系统</title>
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon">
+  <link href="../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Raleway:300,400,600,700,900" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- ======= Header ======= -->
+  <header id="header">
+    <div class="container">
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Content Section ======= -->
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title">
+        <h2>关键词：{{ detail.keyword }}</h2>
+        <p>该词涉及 <strong>{{ detail.total_tf }}</strong>  篇新闻</p>
+      </div>
+
+      <!-- ======= Article Table ======= -->
+      <section class="counts section-bg">
+        <div class="container">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>标题</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for new in detail.articles %}
+              <tr>
+                <td>{{ new.article_id }}</td>
+                <td><a href="{{ new.url }}" target="_blank">{{ new.title }}</a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ======= Pagination ======= -->
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <!-- 上一页 -->
+          <li class="page-item {% if detail.current_page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="?id={{ detail.id }}&page={{ detail.current_page - 1 }}">上一页</a>
+          </li>
+
+          <!-- 首页 -->
+          <li class="page-item {% if detail.current_page == 1 %}active{% endif %}">
+            <a class="page-link" href="?id={{ detail.id }}&page=1">1</a>
+          </li>
+
+          <!-- 左侧省略号 -->
+          {% if detail.current_page > 4 %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+
+          <!-- 中间页码 -->
+          {% for p in range(detail.current_page - 2, detail.current_page + 3) %}
+            {% if p > 1 and p < detail.pages %}
+            <li class="page-item {% if p == detail.current_page %}active{% endif %}">
+              <a class="page-link" href="?id={{ detail.id }}&page={{ p }}">{{ p }}</a>
+            </li>
+            {% endif %}
+          {% endfor %}
+
+          <!-- 右侧省略号 -->
+          {% if detail.current_page < detail.pages - 3 %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+
+          <!-- 末页 -->
+          {% if detail.pages > 1 %}
+          <li class="page-item {% if detail.current_page == detail.pages %}active{% endif %}">
+            <a class="page-link" href="?id={{ detail.id }}&page={{ detail.pages }}">{{ detail.pages }}</a>
+          </li>
+          {% endif %}
+
+          <!-- 下一页 -->
+          <li class="page-item {% if detail.current_page == detail.pages %}disabled{% endif %}">
+            <a class="page-link" href="?id={{ detail.id }}&page={{ detail.current_page + 1 }}">下一页</a>
+          </li>
+        </ul>
+
+        <!-- 跳转 -->
+        <form class="form-inline justify-content-center mt-2" onsubmit="return goToPage(event)" data-max-page="{{ detail.pages }}">
+          <label for="pageInput" class="mr-2">跳转到第</label>
+          <input type="number" min="1" max="{{ detail.pages }}" id="pageInput" class="form-control form-control-sm" style="width: 80px;" required>
+          <label class="ml-2 mr-2">页</label>
+          <button type="submit" class="btn btn-sm btn-primary">跳转</button>
+        </form>
+      </nav>
+
+      <!-- 跳转JS -->
+      <script>
+        function goToPage(event) {
+          event.preventDefault();
+          const form = event.target;
+          const maxPage = parseInt(form.getAttribute('data-max-page'), 10) || 1;
+          const page = parseInt(document.getElementById('pageInput').value, 10);
+          if (isNaN(page) || page < 1 || page > maxPage) {
+            alert('请输入1到' + maxPage + '之间的页码');
+            return false;
+          }
+          const id = "{{ detail.id }}";
+          window.location.href = `?id=${id}&page=${page}`;
+          return false;
+        }
+      </script>
+    </div>
+  </section>
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+  <script src="../static/assets/js/main.js"></script>
+</body>
+
+</html>

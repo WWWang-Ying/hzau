@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script src="../static/assets/js/echarts.min.js"></script>
+  <script src="../static/assets/js/echarts-wordcloud.min.js"></script>
+  <title>新闻数据分析</title>
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <header id="header">
+    <div class="container">
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title">
+        <h2>实时系统的话题分析系统</h2>
+      </div>
+
+      <div class="row mb-5">
+        <div class="col-md-6">
+          <div id="main" style="width: 100%; height: 400px;"></div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center justify-content-center">
+          <div id="wordcloud" style="width: 100%; height: 400px;"></div>
+        </div>
+      </div>
+
+      <!-- 下拉选择 + 确认按钮 -->
+      <form method="GET" action="/news_result.html" class="d-flex justify-content-center mb-4">
+        <input type="hidden" name="query" value="{{ request.args.get('query', '') }}">
+
+        <label for="analysisSelect" class="mr-2 align-self-center"><strong>选择分析项：</strong></label>
+        <select id="analysisSelect" name="sort_by" class="form-control w-auto">
+          <option value="default" {% if sort_by == 'default' %}selected{% endif %}>相关度排序</option>
+          <option value="time" {% if sort_by == 'time' %}selected{% endif %}>时间排序</option>
+          <option value="views" {% if sort_by == 'views' %}selected{% endif %}>浏览量排序</option>
+          <option value="comments" {% if sort_by == 'comments' %}selected{% endif %}>评论数排序</option>
+        </select>
+        <button type="submit" class="btn btn-primary ml-2">确定</button>
+      </form>
+
+      <!-- 表格区域 -->
+      <section class="counts section-bg">
+        <div class="container">
+          <table class="table table-striped table-hover">
+            <tr>
+              <td>id</td>
+              <td>标题</td>
+              <td>内容</td>
+              <td>发布时间</td>
+              <td>来源</td>
+              <td>keywords</td>
+            </tr>
+            {% for new in news %}
+            <tr>
+              <td>{{ new[0] }}</td>
+              <td><a href="{{ new[1] }}" target="_blank">{{ new[2] }}</a></td>
+              <td>
+                <span id="preview-{{ loop.index }}">{{ new[3][:100] }}{% if new[3]|length > 100 %}...{% endif %}</span>
+                {% if new[3]|length > 100 %}
+                <a href="javascript:void(0);" onclick="toggleContent('{{ loop.index }}')" id="btn-{{ loop.index }}">显示全文</a>
+                <span id="full-{{ loop.index }}" style="display:none;">{{ new[3] }}</span>
+                {% endif %}
+              </td>
+              <td>{{ new[4] }}</td>
+              <td>{{ new[5] }}</td>
+              <td>{{ new[8] }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- 热度图表 -->
+  <script type="text/javascript">
+    var dom = document.getElementById("main");
+    var myChart = echarts.init(dom);
+    var option = {
+      color: ['#007bff', '#dc3545'],
+      title: {
+        text: '热度分析',
+        left: 'center'
+      },
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params) {
+          let index = params[0].dataIndex;
+          let titles = {{ titles | tojson }};
+          let pub_times = {{ pub_times | tojson }};
+          let views = params[0].value;
+          let comments = params[1].value;
+          return `<strong>标题：</strong>${titles[index]}<br/>
+                  <strong>时间：</strong>${pub_times[index]}<br/>
+                  <strong>浏览量：</strong>${views}<br/>
+                  <strong>评论数：</strong>${comments}`;
+        }
+      },
+      legend: {
+        data: ['浏览量', '评论数'],
+        top: '10%'
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '8%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: {{ pub_times | tojson }}
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: '浏览量',
+          position: 'left',
+          axisLine: { lineStyle: { color: '#007bff' } }
+        },
+        {
+          type: 'value',
+          name: '评论数',
+          position: 'right',
+          axisLine: { lineStyle: { color: '#dc3545' } }
+        }
+      ],
+      series: [
+        { name: '浏览量', type: 'line', data: {{ views | tojson }}, yAxisIndex: 0 },
+        { name: '评论数', type: 'line', data: {{ comments | tojson }}, yAxisIndex: 1 }
+      ]
+    };
+    myChart.setOption(option);
+  </script>
+
+  <!-- 词云图 -->
+  <script>
+    var wordCloudDom = document.getElementById('wordcloud');
+    var wordCloudChart = echarts.init(wordCloudDom);
+    var option = {
+      tooltip: { show: true },
+      series: [{
+        type: 'wordCloud',
+        shape: 'square',
+        left: 'center',
+        top: 'center',
+        width: '100%',
+        height: '100%',
+        sizeRange: [14, 50],
+        rotationRange: [-45, 90],
+        rotationStep: 45,
+        gridSize: 8,
+        drawOutOfBound: false,
+        textStyle: {
+          color: () => 'rgb(0, 255, 0)'
+        },
+        emphasis: {
+          focus: 'self',
+          textStyle: {
+            shadowBlur: 10,
+            shadowColor: '#333'
+          }
+        },
+        data: {{ wordcloud_data | tojson }}
+      }]
+    };
+    wordCloudChart.setOption(option);
+  </script>
+
+  <!-- 展开全文功能 -->
+  <script>
+    function toggleContent(index) {
+      const preview = document.getElementById('preview-' + index);
+      const full = document.getElementById('full-' + index);
+      const btn = document.getElementById('btn-' + index);
+      if (full.style.display === "none") {
+        preview.style.display = "none";
+        full.style.display = "inline";
+        btn.innerText = "收起";
+      } else {
+        preview.style.display = "inline";
+        full.style.display = "none";
+        btn.innerText = "显示全文";
+      }
+    }
+  </script>
+
+  <!-- JS 资源 -->
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+  <script src="../static/assets/js/main.js"></script>
+
+</body>
+</html>

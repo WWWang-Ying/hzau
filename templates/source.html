@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script src="../static/assets/js/echarts.min.js"></script>
+
+  <title>新闻数据分析</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header">
+    <div class="container">
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav><!-- .nav-menu -->
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Our Team Section ======= -->
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title">
+        <h2>新闻内容关键词频率分布</h2>
+      </div>
+
+      <!-- ======= Counts Section ======= -->
+      <section class="counts section-bg">
+        <div class="container">
+          <div id="main" style="width: 100%;height:400px"></div>
+        </div>
+      </section><!-- End Counts Section -->
+
+    </div>
+  </section><!-- End Our Team Section -->
+
+  <script type="text/javascript">
+    var dom = document.getElementById("main");
+    var myChart = echarts.init(dom);
+    var app = {};
+
+    // 将关键词与权重合并为饼图需要的格式
+    var words = {{ words|tojson }};
+    var weights = {{ weights }};
+    var pieData = [];
+    for (var i = 0; i < words.length; i++) {
+      pieData.push({ value: weights[i], name: words[i] });
+    }
+
+var option = {
+  color: [
+    '#ff7f50', '#87cefa', '#da70d6', '#32cd32', '#ffd700',
+    '#00ced1', '#ff69b4', '#ba55d3', '#ffa500', '#40e0d0',
+    '#ff6347', '#4682b4', '#9acd32', '#ff1493', '#00fa9a',
+    '#1e90ff', '#ff8c00', '#8a2be2', '#00bfff', '#dc143c',
+    '#7b68ee', '#00ff7f', '#d2691e', '#6495ed', '#ffb6c1',
+    '#9932cc', '#3cb371', '#b8860b', '#20b2aa', '#ff4500',
+    '#ee82ee', '#8b0000', '#00ced1', '#ffdab9', '#adff2f',
+    '#b0c4de', '#ffdead', '#e9967a', '#dda0dd', '#f0e68c'
+  ],
+
+  tooltip: {
+    trigger: 'item'
+  },
+
+  legend: {
+    type: 'plain',
+    orient: 'vertical',
+    right: 10,
+    top: 20,
+    bottom: 20,
+    textStyle: {
+      fontSize: 12
+    }
+  },
+
+  toolbox: {
+    show: true,
+    feature: {
+      saveAsImage: {},
+      dataView: { readOnly: true },
+      restore: {}
+    }
+  },
+
+  series: [
+    {
+      type: 'pie',
+      radius: ['40%', '75%'],
+      center: ['35%', '50%'],
+      data: pieData,
+      avoidLabelOverlap: false,
+      labelLine: {
+        show: false,
+      },
+      label: {
+        show: false,
+      },
+      emphasis: {
+        scale: true,
+        scaleSize: 10,
+        itemStyle: {
+          shadowBlur: 30,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }
+  ]
+};
+
+
+    if (option && typeof option === "object") {
+      myChart.setOption(option, true);
+    }
+  </script>
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../static/assets/js/main.js"></script>
+
+</body>
+
+</html>

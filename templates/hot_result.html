@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script src="../static/assets/js/echarts.min.js"></script>
+  <title>新闻数据分析</title>
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header">
+    <div class="container">
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======= 分析图表 ======= -->
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title">
+        <h2>主题热度分析</h2>
+        <p>数据时间范围：{{ start_date }} 到 {{ end_date }}</p>
+      </div>
+
+      <section class="counts section-bg">
+        <div class="container">
+          <div id="main" style="width: 100%; height: 400px;"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ======= ECharts Script ======= -->
+  <script type="text/javascript">
+    var dom = document.getElementById("main");
+    var myChart = echarts.init(dom);
+    var option = {
+      color: ['#007bff', '#dc3545'],
+
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params) {
+          let index = params[0].dataIndex;
+          let titles = {{ titles | tojson }};
+          let pub_times = {{ pub_times | tojson }};
+          let views = params[0].value;
+          let comments = params[1].value;
+
+          return `
+            <strong>标题：</strong>${titles[index]}<br/>
+            <strong>时间：</strong>${pub_times[index]}<br/>
+            <strong>浏览量：</strong>${views}<br/>
+            <strong>评论数：</strong>${comments}
+          `;
+        }
+      },
+      legend: {
+        data: ['浏览量', '评论数'],
+        top: '10%'
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '8%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: {{ pub_times | tojson }}
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: '浏览量',
+          position: 'left',
+          axisLine: {
+            lineStyle: {
+              color: '#007bff'
+            }
+          },
+          axisLabel: {
+            formatter: '{value}'
+          }
+        },
+        {
+          type: 'value',
+          name: '评论数',
+          position: 'right',
+          axisLine: {
+            lineStyle: {
+              color: '#dc3545'
+            }
+          },
+          axisLabel: {
+            formatter: '{value}'
+          }
+        }
+      ],
+      series: [
+        {
+          name: '浏览量',
+          type: 'line',
+          data: {{ views | tojson }},
+          smooth: true,
+          yAxisIndex: 0,
+          lineStyle: {
+            color: '#007bff'
+          }
+        },
+        {
+          name: '评论数',
+          type: 'line',
+          data: {{ comments | tojson }},
+          smooth: true,
+          yAxisIndex: 1,
+          lineStyle: {
+            color: 'rgba(220, 53, 69, 0.7)',  // 半透明红色
+          }
+        }
+      ]
+    };
+    myChart.setOption(option);
+  </script>
+
+  <!-- Back to top & Vendor JS -->
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+  <script src="../static/assets/js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>实时系统的话题分析系统</title>
+  <meta content="" name="description" />
+  <meta content="" name="keywords" />
+
+  <!-- Favicons -->
+  <link href="../static/assets/img/favicon.png" rel="icon" />
+  <link href="../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900"
+    rel="stylesheet"
+  />
+
+  <!-- Vendor CSS Files -->
+  <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/icofont/icofont.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/animate.css/animate.min.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/venobox/venobox.css" rel="stylesheet" />
+  <link href="../static/assets/vendor/aos/aos.css" rel="stylesheet" />
+
+  <!-- Template Main CSS File -->
+  <link href="../static/assets/css/style.css" rel="stylesheet" />
+
+  <style>
+    .count-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 320px;
+      height: 200px;
+      margin: 10px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      color: #333333;
+      font-weight: 600;
+      font-size: 18px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      border-radius: 0;
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .count-box i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: #555555;
+    }
+
+    .count-box span {
+      font-size: 22px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .count-box p {
+      font-size: 14px;
+      color: #777777;
+      margin: 0;
+    }
+
+    .count-box:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px);
+    }
+
+    .count-box.active {
+      box-shadow: 0 0 0 2px #d4af37;
+      transform: translateY(-3px);
+    }
+
+    .count-box:focus {
+      outline: none;
+    }
+
+    /* 增加间隔，确保按钮横向排列时居中且不拥挤 */
+    .counts .row {
+      justify-content: center;
+    }
+
+    /* 日期选择器区域居中 */
+    #date-range {
+      margin-top: 40px;
+    }
+
+    /* 调整表单元素间距 */
+    #date-form .form-group {
+      margin-bottom: 15px;
+    }
+
+    /* 确定按钮调整 */
+    #date-form button {
+      width: 100%;
+    }
+
+    /* 响应式：小屏幕下按钮宽度自适应 */
+    @media (max-width: 767px) {
+      .count-box {
+        width: 90%;
+        height: auto;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ======= Header ======= -->
+  <header id="header">
+    <div class="container">
+      <nav class="nav-menu float-right d-none d-lg-block">
+        <ul>
+          <li><a href="index.html">首页</a></li>
+          <li class="active"><a href="search.html">搜索</a></li>
+          <li><a href="choose.html">分析</a></li>
+          <li><a href="news.html">新闻总数</a></li>
+          <li><a href="num.html">词汇统计</a></li>
+        </ul>
+      </nav>
+      <!-- .nav-menu -->
+    </div>
+  </header>
+  <!-- End Header -->
+
+  <!-- ======= Our Team Section ======= -->
+  <section id="team" class="team">
+    <div class="container">
+      <div class="section-title" style="margin-bottom: 40px;">
+        <h2>实时系统的话题分析系统</h2>
+      </div>
+
+      <!-- 选择类型按钮部分 -->
+      <section class="counts section-bg" style="padding-bottom: 30px;">
+        <div class="counts-section-title" style="text-align:center; margin-bottom:20px;"data-aos="fade-up" data-aos-delay="150">
+          <h3>选择你想查看的类型</h3>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-4 col-md-6 text-center" data-aos="fade-up" data-aos-delay="200">
+            <button class="count-box" onclick="selectOption('word', this)">
+              <i class="icofont-ui-chat" style="color: #ffb459;"></i>
+              <span>词云</span>
+              <p>词汇生成的词云</p>
+            </button>
+          </div>
+
+          <div class="col-lg-4 col-md-6 text-center" data-aos="fade-up" data-aos-delay="200">
+            <button class="count-box" onclick="selectOption('analysis', this)">
+              <i class="icofont-chart-bar-graph" style="color: #134cde;"></i>
+              <span>可视化</span>
+              <p>出现最多的词</p>
+            </button>
+          </div>
+
+          <div class="col-lg-4 col-md-6 text-center" data-aos="fade-up" data-aos-delay="200">
+            <button class="count-box" onclick="selectOption('hot_result', this)">
+              <i class="icofont-chart-line" style="color: #e81d90;"></i>
+              <span>热度分析</span>
+              <p>关于我们</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- 日期选择器部分 -->
+        <div class="counts-section-title" style="text-align:center; margin-bottom: 20px;"data-aos="fade-up" data-aos-delay="200">
+          <h4>选择日期和时间范围</h4>
+        </div>
+        <form id="date-form">
+          <div class="row justify-content-center">
+            <div class="col-md-4 col-sm-6"data-aos="fade-up" data-aos-delay="250">
+              <div class="form-group">
+                <label for="start-date">开始日期和时间</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="start-date"
+                  name="start-date"
+                />
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6"data-aos="fade-up" data-aos-delay="300">
+              <div class="form-group">
+                <label for="end-date">结束日期和时间</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="end-date"
+                  name="end-date"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- 按钮单独一行 -->
+          <div class="row justify-content-center mt-3">
+            <div class="col-md-3 col-sm-6"data-aos="fade-up" data-aos-delay="400">
+              <button
+                type="button"
+                class="btn btn-primary w-100"
+                onclick="submitForm()"
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+  </section>
+  <!-- End Our Team Section -->
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <!-- <script src="../static/assets/vendor/php-email-form/validate.js"></script> -->
+  <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="../static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="../static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="../static/assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../static/assets/js/main.js"></script>
+
+  <script>
+    let selectedOption = '';
+
+    // 选择按钮时，切换选中样式并保存选项
+    function selectOption(option, btn) {
+      selectedOption = option;
+
+      // 移除所有按钮的 active 类
+      const buttons = document.querySelectorAll('.count-box');
+      buttons.forEach((b) => b.classList.remove('active'));
+
+      // 给当前点击按钮加 active 类
+      btn.classList.add('active');
+    }
+
+    // 点击确定后提交数据，根据类型跳转页面并带时间参数
+    function submitForm() {
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+
+      if (!selectedOption) {
+        alert('请选择一个类型！');
+        return;
+      }
+      if (!startDate || !endDate) {
+        alert('请选择开始和结束日期！');
+        return;
+      }
+      if (startDate > endDate) {
+        alert('开始日期不能晚于结束日期！');
+        return;
+      }
+
+      let targetPage = '';
+      switch (selectedOption) {
+        case 'word':
+          targetPage = 'word.html';
+          break;
+        case 'analysis':
+          targetPage = 'analysis.html';
+          break;
+        case 'hot_result':
+          targetPage = 'hot_result.html';
+          break;
+        default:
+          alert('未知的类型！');
+          return;
+      }
+
+      // 拼接URL参数（用encodeURIComponent防止特殊字符出错）
+      const url = `${targetPage}?start-date=${encodeURIComponent(startDate)}&end-date=${encodeURIComponent(endDate)}`;
+
+      // 跳转页面
+      window.location.href = url;
+    }
+  </script>
+</body>
+
+</html>
