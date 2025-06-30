@@ -50,10 +50,6 @@
 
 ---
 
-以下是你要添加到 `README.md` **底部**的完整 Markdown 内容，描述项目六大功能，并附带 B 站操作演示链接：
-
----
-
 ##  项目功能一览
 
 本系统共实现六大核心功能，涵盖新闻检索、分析、展示与统计：
@@ -105,7 +101,7 @@
 
 ##  操作演示视频（B站）
 
-👉 [点击查看项目完整操作演示]([https://www.bilibili.com/video/BV1XXXXXXX](https://www.bilibili.com/video/BV1hygkzUEqW/?vd_source=87a4771a71a01f3e236c8a8672410796))
+👉 [点击查看项目完整操作演示（B站）](https://www.bilibili.com/video/BV1hygkzUEqW/)
 
 
 
